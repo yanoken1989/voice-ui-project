@@ -1,2 +1,4 @@
 # .gitignore の中
 .env
+node_modules/
+
