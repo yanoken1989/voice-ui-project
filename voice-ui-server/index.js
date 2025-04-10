@@ -19,7 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: ['https://voice-ui-project.vercel.app', 'http://localhost:3000'],
+  origin: ['https://voice-ui-project-h48y.vercel.app', 'http://localhost:3000'],
   credentials: true
 }));
 app.use(express.json());
