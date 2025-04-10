@@ -8,6 +8,9 @@ const ProductionForm = () => {
 
   const [text, setText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  
+  // API URLを環境変数から取得
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
   const handleVoiceInput = async () => {
     try {
@@ -29,11 +32,9 @@ const ProductionForm = () => {
         formData.append("language", "ja");
 
         try {
-          const res = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+          // 直接OpenAI APIを呼び出す代わりにバックエンドのエンドポイントを使用
+          const res = await fetch(`${API_URL}/transcribe`, {
             method: "POST",
-            headers: {
-              Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
-            },
             body: formData,
           });
 
@@ -82,7 +83,7 @@ const ProductionForm = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:3001/records/bulk", {
+      const res = await fetch(`${API_URL}/records/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ records: items }),

@@ -5,13 +5,16 @@ import toast from "react-hot-toast";
 const HistoryList = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // API URLを環境変数から取得（ローカル開発時はフォールバック値を使用）
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
   useEffect(() => {
     const fetchRecords = async () => {
       const user_id = localStorage.getItem("user_id");
 
       try {
-        const res = await fetch(`http://localhost:3001/records?user_id=${user_id}`);
+        const res = await fetch(`${API_URL}/records?user_id=${user_id}`);
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -29,11 +32,11 @@ const HistoryList = () => {
     };
 
     fetchRecords();
-  }, []);
+  }, [API_URL]);
 
   const handleSave = async (id, quantity, record) => {
     try {
-      const res = await fetch(`http://localhost:3001/records/update`, {
+      const res = await fetch(`${API_URL}/records/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
