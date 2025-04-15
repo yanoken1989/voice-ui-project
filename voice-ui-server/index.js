@@ -18,16 +18,30 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORSの設定を拡張（localhost:5000からのリクエストも許可）
 app.use(cors({
-  origin: ['https://voice-ui-project-h48y.vercel.app', 'http://localhost:3000'],
-  credentials: true
+  origin: ['https://voice-ui-project-h48y.vercel.app', 'http://localhost:3000', 'http://localhost:5000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
+
+// プリフライトリクエスト対応
+app.options('*', cors());
+
 app.use(express.json());
+
+// ルートパスにAPIエンドポイントを追加
+app.get('/', (req, res) => {
+  res.json({ message: 'API サーバーが正常に動作しています' });
+});
 
 // ============================
 // 🔐 ログイン認証
 // ============================
-app.post("/login", async (req, res) => {
+// auth/loginパスも追加（エラーログに合わせて）
+app.post(["/login", "/api/auth/login"], async (req, res) => {
   const { user_id, password } = req.body;
 
   try {
@@ -57,10 +71,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// 他のエンドポイントもapi/プレフィックスで使えるようにする
 // ============================
 // 💾 単件保存
 // ============================
-app.post("/save", async (req, res) => {
+app.post(["/save", "/api/save"], async (req, res) => {
   const { user_id, date, item, quantity } = req.body;
 
   if (!user_id || !date || !item || !quantity) {
@@ -79,7 +94,7 @@ app.post("/save", async (req, res) => {
 // ============================
 // 📦 複数レコード保存（bulk）
 // ============================
-app.post("/records/bulk", async (req, res) => {
+app.post(["/records/bulk", "/api/records/bulk"], async (req, res) => {
   const { records } = req.body;
 
   if (!Array.isArray(records)) {
@@ -103,7 +118,7 @@ app.post("/records/bulk", async (req, res) => {
 // ============================
 // 📚 履歴取得
 // ============================
-app.get("/records", async (req, res) => {
+app.get(["/records", "/api/records"], async (req, res) => {
   const { user_id } = req.query;
 
   if (!user_id) {
@@ -122,7 +137,7 @@ app.get("/records", async (req, res) => {
 // ============================
 // ✏️ 数量編集（更新）
 // ============================
-app.post("/records/update", async (req, res) => {
+app.post(["/records/update", "/api/records/update"], async (req, res) => {
   const { user_id, date, item, quantity } = req.body;
 
   if (!user_id || !date || !item || typeof quantity !== "number") {
@@ -148,7 +163,7 @@ app.post("/records/update", async (req, res) => {
 // ============================
 const upload = multer({ storage: multer.memoryStorage() });
 
-app.post("/transcribe", upload.single("file"), async (req, res) => {
+app.post(["/transcribe", "/api/transcribe"], upload.single("file"), async (req, res) => {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
     const formData = new FormData();
@@ -191,4 +206,5 @@ app.post("/transcribe", upload.single("file"), async (req, res) => {
 // ============================
 app.listen(PORT, () => {
   console.log(`✅ サーバー起動完了: http://localhost:${PORT}`);
+  console.log(`👉 APIエンドポイント: http://localhost:${PORT}/api/auth/login`);
 });
