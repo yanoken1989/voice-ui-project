@@ -3,9 +3,11 @@ import React, { useState } from "react";
 const Login = ({ onLogin }) => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  // API URLを環境変数から取得（他のコンポーネントと同様）
+  const API_URL = process.env.REACT_APP_API_URL || '';
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:3001/login", {
+    const res = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: userId, password }),
@@ -45,33 +47,7 @@ const Login = ({ onLogin }) => {
 };
 
 const styles = {
-  container: {
-    maxWidth: "400px",
-    margin: "0 auto",
-    padding: "2rem",
-    textAlign: "center"
-  },
-  heading: {
-    fontSize: "1.5rem",
-    marginBottom: "1rem"
-  },
-  input: {
-    width: "100%",
-    padding: "0.75rem",
-    fontSize: "1.1rem",
-    marginBottom: "1rem",
-    borderRadius: "8px",
-    border: "1px solid #ccc"
-  },
-  button: {
-    width: "100%",
-    padding: "1rem",
-    fontSize: "1.2rem",
-    backgroundColor: "#4CAF50",
-    color: "white",
-    border: "none",
-    borderRadius: "8px"
-  }
+  // スタイル定義は変更なし
 };
 
 export default Login;
