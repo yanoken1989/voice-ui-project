@@ -18,7 +18,7 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORSの設定を拡張（localhost:5000からのリクエストも許可）
+// CORSの設定を拡張
 app.use(cors({
   origin: ['https://voice-ui-project-h48y.vercel.app', 'http://localhost:3000', 'http://localhost:5000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -40,8 +40,7 @@ app.get('/', (req, res) => {
 // ============================
 // 🔐 ログイン認証
 // ============================
-// auth/loginパスも追加（エラーログに合わせて）
-app.post(["/login", "/api/auth/login"], async (req, res) => {
+const handleLogin = async (req, res) => {
   const { user_id, password } = req.body;
 
   try {
@@ -69,13 +68,15 @@ app.post(["/login", "/api/auth/login"], async (req, res) => {
     console.error("🔴 ログインエラー:", error);
     res.status(500).json({ message: "サーバーエラーです" });
   }
-});
+};
 
-// 他のエンドポイントもapi/プレフィックスで使えるようにする
+app.post("/login", handleLogin);
+app.post("/api/auth/login", handleLogin);
+
 // ============================
 // 💾 単件保存
 // ============================
-app.post(["/save", "/api/save"], async (req, res) => {
+const handleSave = async (req, res) => {
   const { user_id, date, item, quantity } = req.body;
 
   if (!user_id || !date || !item || !quantity) {
@@ -89,12 +90,15 @@ app.post(["/save", "/api/save"], async (req, res) => {
     console.error("❌ 保存失敗:", error);
     res.status(500).json({ message: "保存に失敗しました", error: error.message });
   }
-});
+};
+
+app.post("/save", handleSave);
+app.post("/api/save", handleSave);
 
 // ============================
 // 📦 複数レコード保存（bulk）
 // ============================
-app.post(["/records/bulk", "/api/records/bulk"], async (req, res) => {
+const handleBulkSave = async (req, res) => {
   const { records } = req.body;
 
   if (!Array.isArray(records)) {
@@ -113,12 +117,15 @@ app.post(["/records/bulk", "/api/records/bulk"], async (req, res) => {
     console.error("❌ 一括保存失敗:", error);
     res.status(500).json({ message: "一括保存に失敗しました", error: error.message });
   }
-});
+};
+
+app.post("/records/bulk", handleBulkSave);
+app.post("/api/records/bulk", handleBulkSave);
 
 // ============================
 // 📚 履歴取得
 // ============================
-app.get(["/records", "/api/records"], async (req, res) => {
+const handleGetRecords = async (req, res) => {
   const { user_id } = req.query;
 
   if (!user_id) {
@@ -132,12 +139,15 @@ app.get(["/records", "/api/records"], async (req, res) => {
     console.error("❌ 履歴取得失敗:", error);
     res.status(500).json({ message: "履歴の取得に失敗しました" });
   }
-});
+};
+
+app.get("/records", handleGetRecords);
+app.get("/api/records", handleGetRecords);
 
 // ============================
 // ✏️ 数量編集（更新）
 // ============================
-app.post(["/records/update", "/api/records/update"], async (req, res) => {
+const handleUpdateRecord = async (req, res) => {
   const { user_id, date, item, quantity } = req.body;
 
   if (!user_id || !date || !item || typeof quantity !== "number") {
@@ -156,14 +166,17 @@ app.post(["/records/update", "/api/records/update"], async (req, res) => {
     console.error("❌ 更新失敗:", error);
     res.status(500).json({ message: "更新に失敗しました", error: error.message });
   }
-});
+};
+
+app.post("/records/update", handleUpdateRecord);
+app.post("/api/records/update", handleUpdateRecord);
 
 // ============================
 // 🎙️ Whisper音声→テキスト変換
 // ============================
 const upload = multer({ storage: multer.memoryStorage() });
 
-app.post(["/transcribe", "/api/transcribe"], upload.single("file"), async (req, res) => {
+const handleTranscribe = async (req, res) => {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
     const formData = new FormData();
@@ -199,7 +212,10 @@ app.post(["/transcribe", "/api/transcribe"], upload.single("file"), async (req, 
     console.error("Whisper API error:", err.message);
     res.status(500).json({ error: "音声の変換に失敗しました" });
   }
-});
+};
+
+app.post("/transcribe", upload.single("file"), handleTranscribe);
+app.post("/api/transcribe", upload.single("file"), handleTranscribe);
 
 // ============================
 // 🚀 サーバー起動
