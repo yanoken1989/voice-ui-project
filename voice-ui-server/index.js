@@ -342,3 +342,33 @@ app.listen(PORT, () => {
   console.log(`✅ サーバー起動完了: http://localhost:${PORT}`);
   console.log(`👉 APIエンドポイント: http://localhost:${PORT}/api/auth/login`);
 });
+
+// ============================
+// 🚀 会員登録
+// ============================
+app.post("/register", async (req, res) => {
+  const { username, email, password } = req.body;
+  
+  // ユーザー登録処理
+  try {
+    // 実際の処理はプロジェクトの要件に合わせて実装
+    // 例: Googleシートにユーザーデータを追加
+    res.json({ message: "登録成功" });
+  } catch (error) {
+    console.error("登録エラー:", error);
+    res.status(500).json({ message: "登録に失敗しました" });
+  }
+});
+
+app.post("/api/auth/register", async (req, res) => {
+  // 上記と同じ処理を再利用
+  const { username, email, password } = req.body;
+  
+  try {
+    // 実際の処理
+    res.json({ message: "登録成功" });
+  } catch (error) {
+    console.error("登録エラー:", error);
+    res.status(500).json({ message: "登録に失敗しました" });
+  }
+});
