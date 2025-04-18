@@ -26,7 +26,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('/api/auth/login', formData);
+      const response = await axios.post('/auth/login', formData);
       setCurrentUser(response.data.user);
       navigate('/dashboard');
     } catch (err) {
