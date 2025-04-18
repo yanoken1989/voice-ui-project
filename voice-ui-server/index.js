@@ -18,8 +18,14 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORSの設定をシンプルに
-app.use(cors());
+// index.js のCORS設定を修正
+app.use(cors({
+  origin: 'https://voice-ui-project-h48y.vercel.app', // Vercelのフロントエンドの正確なURL
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 
 app.use(express.json());
 
